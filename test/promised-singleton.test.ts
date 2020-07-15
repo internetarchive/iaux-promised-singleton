@@ -1,40 +1,52 @@
-import { html, fixture, expect } from '@open-wc/testing';
+import { expect } from '@open-wc/testing';
 
-import {PromisedSingleton} from '../src/PromisedSingleton.js';
-import '../promised-singleton.js';
+import { PromisedSingleton } from '../src/promised-singleton';
 
-describe('PromisedSingleton', () => {
-  it('has a default title "Hey there" and counter 5', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton></promised-singleton>
-    `);
+describe('Promised Singleton', () => {
+  it('can execute the promised result', async () => {
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: new Promise(resolve => {
+        resolve('foo');
+      }),
+    });
 
-    expect(el.title).to.equal('Hey there');
-    expect(el.counter).to.equal(5);
+    const result = await promisedSingleton.get();
+    expect(result).to.equal('foo');
   });
 
-  it('increases the counter on button click', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton></promised-singleton>
-    `);
-    el.shadowRoot!.querySelector('button')!.click();
+  it('only executes the promised result once', async () => {
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: new Promise(resolve => {
+        const random = Math.random();
+        resolve(`foo-${random}`);
+      }),
+    });
 
-    expect(el.counter).to.equal(6);
+    const result = await promisedSingleton.get();
+    const result2 = await promisedSingleton.get();
+    expect(result).to.equal(result2);
   });
 
-  it('can override the title via attribute', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton title="attribute title"></promised-singleton>
-    `);
+  it('resolves many concurrent requests for the singlton', async () => {
+    const count = 5;
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: new Promise(resolve => {
+        const random = Math.random();
+        resolve(`foo-${random}`);
+      }),
+    });
 
-    expect(el.title).to.equal('attribute title');
-  });
+    const promises: Promise<string>[] = [];
+    for (let index = 0; index < count; index++) {
+      const promise = promisedSingleton.get();
+      promises.push(promise);
+    }
 
-  it('passes the a11y audit', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton></promised-singleton>
-    `);
+    const results: string[] = await Promise.all(promises);
 
-    await expect(el).shadowDom.to.be.accessible();
+    const firstResult = results[0];
+    for (let index = 0; index < count; index++) {
+      expect(results[index]).to.equal(firstResult);
+    }
   });
 });

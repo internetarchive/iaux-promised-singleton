@@ -1,13 +1,13 @@
 {
-  "name": "promised-singleton",
-  "version": "0.0.0",
-  "description": "Webcomponent promised-singleton following open-wc recommendations",
+  "name": "@internetarchive/promised-singleton",
+  "version": "0.0.0-alpha.1",
+  "description": "A",
   "author": "promised-singleton",
-  "license": "MIT",
-  "main": "index.js",
-  "module": "index.js",
+  "license": "AGPL-3.0-only",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start": "concurrently --kill-others --names tsc,es-dev-server \"npm run tsc:watch\" \"es-dev-server --app-index demo/index.html --node-resolve --open --watch\"",
     "tsc:watch": "tsc --watch",
     "lint:eslint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format:eslint": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
@@ -15,14 +15,12 @@
     "format:prettier": "prettier \"**/*.js\" \"**/*.ts\" --write --ignore-path .gitignore",
     "lint": "npm run lint:eslint && npm run lint:prettier",
     "format": "npm run format:eslint && npm run format:prettier",
-    "test": "tsc && karma start --coverage",
+    "test": "npm run lint && tsc && karma start --coverage",
     "test:watch": "concurrently --kill-others --names tsc,karma \"npm run tsc:watch\" \"karma start --auto-watch=true --single-run=false\""
   },
-  "dependencies": {
-    "lit-html": "^1.1.2",
-    "lit-element": "^2.2.1"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "lit-html": "^1.1.2",
     "@types/node": "13.11.1",
     "es-dev-server": "^1.23.0",
     "typescript": "~3.8.2",
