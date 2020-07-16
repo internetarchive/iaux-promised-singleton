@@ -45,14 +45,13 @@ export class FooServiceProvider {
     this.service = new PromisedSingleton<FooService>({
       generator: new Promise(resolve => {
         const service = new FooService();
-        await service.setup();
-        resolve(service);
+        service.setup().then(service => resolve(service))
       })
     });
   }
 }
 
-// consumer-1.ts
+// consumer.ts
 import { FooServiceProvider } from './foo-service-provider';
 
 export class Consumer1 {
@@ -63,21 +62,7 @@ export class Consumer1 {
 
   async setup() {
     // Call `.get()` on the property to fetch an instance of `FooService`
-    const service = await this.serviceProvider.fooService.get();
-    const result = await service.fetchFoos();
-  }
-}
-
-// consumer-2.ts
-import { FooServiceProvider } from './foo-service-provider';
-
-export class Consumer2 {
-  constructor(serviceProvider: FooServiceProvider) {
-    this.serviceProvider = serviceProvider
-  }
-
-  async setup() {
-    // Consumer1 and Consumer2 may both request these concurrently and will get the same FooService object
+    // Many consumers can call `get()` and they will all receive the same instance
     const service = await this.serviceProvider.fooService.get();
     const result = await service.fetchFoos();
   }
@@ -129,9 +114,3 @@ npm run test:watch
 For most of the tools, the configuration is in the `package.json` to reduce the amount of files in your project.
 
 If you customize the configuration a lot, you can consider moving them to individual files.
-
-## Local Demo with `es-dev-server`
-```bash
-npm start
-```
-To run a local development server that serves the basic demo located in `demo/index.html`
