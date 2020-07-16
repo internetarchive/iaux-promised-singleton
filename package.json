@@ -9,6 +9,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "tsc:watch": "tsc --watch",
+    "docs": "typedoc",
     "lint:eslint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format:eslint": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
     "lint:prettier": "prettier \"**/*.js\" \"**/*.ts\" --check --ignore-path .gitignore",
