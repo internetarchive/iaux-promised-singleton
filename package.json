@@ -1,7 +1,7 @@
 {
   "name": "@internetarchive/promised-singleton",
   "version": "0.0.0-alpha.1",
-  "description": "A",
+  "description": "A generic Typescript class for lazy-loading singletons.",
   "author": "promised-singleton",
   "license": "AGPL-3.0-only",
   "main": "dist/index.js",
