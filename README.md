@@ -63,7 +63,11 @@ export class Consumer1 {
   async setup() {
     // Call `.get()` on the property to fetch an instance of `FooService`
     // Many consumers can call `get()` and they will all receive the same instance
-    const service = await this.serviceProvider.fooService.get();
+    try {
+      const service = await this.serviceProvider.fooService.get();
+    } catch (error) {
+      console.error('error fetching service singleton', error);
+    }
     const result = await service.fetchFoos();
   }
 }
