@@ -31,7 +31,7 @@ describe('Promised Singleton', () => {
     expect(result).to.equal(result2);
   });
 
-  it('resolves many concurrent requests for the singlton', async () => {
+  it('resolves many concurrent requests for the singleton', async () => {
     const count = 5;
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
       generator: new Promise(resolve => {
