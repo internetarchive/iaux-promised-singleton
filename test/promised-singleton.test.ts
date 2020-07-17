@@ -6,7 +6,9 @@ describe('Promised Singleton', () => {
   it('can execute the promised result', async () => {
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
       generator: new Promise(resolve => {
-        resolve('foo');
+        setTimeout(() => {
+          resolve('foo');
+        }, 25);
       }),
     });
 
@@ -17,8 +19,10 @@ describe('Promised Singleton', () => {
   it('only executes the promised result once', async () => {
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
       generator: new Promise(resolve => {
-        const random = Math.random();
-        resolve(`foo-${random}`);
+        setTimeout(() => {
+          const random = Math.random();
+          resolve(`foo-${random}`);
+        }, 25);
       }),
     });
 
@@ -31,8 +35,10 @@ describe('Promised Singleton', () => {
     const count = 5;
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
       generator: new Promise(resolve => {
-        const random = Math.random();
-        resolve(`foo-${random}`);
+        setTimeout(() => {
+          const random = Math.random();
+          resolve(`foo-${random}`)
+        }, 25);
       }),
     });
 
