@@ -1,44 +1,44 @@
 {
-  "name": "promised-singleton",
-  "version": "0.0.0",
-  "description": "Webcomponent promised-singleton following open-wc recommendations",
+  "name": "@internetarchive/promised-singleton",
+  "version": "0.0.0-alpha.1",
+  "description": "A class for lazy-loading singletons.",
   "author": "promised-singleton",
-  "license": "MIT",
-  "main": "index.js",
-  "module": "index.js",
+  "license": "AGPL-3.0-only",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start": "concurrently --kill-others --names tsc,es-dev-server \"npm run tsc:watch\" \"es-dev-server --app-index demo/index.html --node-resolve --open --watch\"",
     "tsc:watch": "tsc --watch",
+    "docs": "typedoc",
     "lint:eslint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format:eslint": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
-    "lint:prettier": "prettier \"**/*.js\" \"**/*.ts\" --check --ignore-path .gitignore",
-    "format:prettier": "prettier \"**/*.js\" \"**/*.ts\" --write --ignore-path .gitignore",
+    "lint:prettier": "prettier \"**/*.ts\" --check --ignore-path .gitignore",
+    "format:prettier": "prettier \"**/*.ts\" --write --ignore-path .gitignore",
     "lint": "npm run lint:eslint && npm run lint:prettier",
     "format": "npm run format:eslint && npm run format:prettier",
-    "test": "tsc && karma start --coverage",
+    "test": "npm run lint && tsc && karma start --coverage",
     "test:watch": "concurrently --kill-others --names tsc,karma \"npm run tsc:watch\" \"karma start --auto-watch=true --single-run=false\""
   },
-  "dependencies": {
-    "lit-html": "^1.1.2",
-    "lit-element": "^2.2.1"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/node": "13.11.1",
-    "es-dev-server": "^1.23.0",
-    "typescript": "~3.8.2",
-    "concurrently": "^5.1.0",
-    "tslib": "^1.11.0",
-    "eslint": "^6.1.0",
     "@open-wc/eslint-config": "^2.0.0",
+    "@open-wc/testing": "^2.0.0",
+    "@open-wc/testing-karma": "^3.0.0",
+    "@types/node": "13.11.1",
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",
-    "prettier": "^2.0.4",
+    "concurrently": "^5.1.0",
+    "deepmerge": "^3.2.0",
+    "es-dev-server": "^1.23.0",
+    "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.11.0",
     "husky": "^1.0.0",
     "lint-staged": "^8.0.0",
-    "@open-wc/testing-karma": "^3.0.0",
-    "deepmerge": "^3.2.0",
-    "@open-wc/testing": "^2.0.0"
+    "lit-html": "^1.1.2",
+    "prettier": "^2.0.4",
+    "tslib": "^1.11.0",
+    "typedoc": "^0.17.8",
+    "typescript": "~3.8.2"
   },
   "eslintConfig": {
     "extends": [
@@ -49,6 +49,9 @@
   "prettier": {
     "singleQuote": true,
     "arrowParens": "avoid"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "husky": {
     "hooks": {

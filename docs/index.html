@@ -1,0 +1,195 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@internetarchive/promised-singleton</title>
+	<meta name="description" content="Documentation for @internetarchive/promised-singleton">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@internetarchive/promised-singleton</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>@internetarchive/promised-singleton</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<p><a href="https://travis-ci.com/internetarchive/iaux-promised-singleton"><img src="https://travis-ci.com/internetarchive/iaux-promised-singleton.svg?branch=master" alt="Build Status"></a> <a href="https://codecov.io/gh/internetarchive/iaux-promised-singleton"><img src="https://codecov.io/gh/internetarchive/iaux-promised-singleton/branch/master/graph/badge.svg" alt="codecov"></a></p>
+				<a href="#promisedsingleton" id="promisedsingleton" style="color: inherit; text-decoration: none;">
+					<h1>PromisedSingleton</h1>
+				</a>
+				<p>A generic Typescript class for lazy-loading singletons.</p>
+				<p><code>PromisedSingleton</code> is a generic wrapper for an asynchronously generated object that you only
+				want one instance of (a singleton).</p>
+				<a href="#background" id="background" style="color: inherit; text-decoration: none;">
+					<h3>Background</h3>
+				</a>
+				<p>We often want to generate a single instance of an object, but when that instance is
+					asynchronously generated, you may have many consumers requesting that instance
+					at the same time. The Promises don&#39;t automatically chain so you have to do some
+				gatekeeping to make sure only one instance gets created.</p>
+				<p><code>PromisedSingleton</code> ensures that no matter how many callers request the object,
+				only one instance gets created.</p>
+				<p>It gets initialized with a generator <code>Promise</code> that generates the singleton.
+					When <code>get()</code> is first called, it executes the Promise, caches its results and
+				returns it to the caller.</p>
+				<p>If more callers call it in the interim, it chains the promises and when the singleton
+				is created, it resolves them all.</p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>Installation</h2>
+				</a>
+				<pre><code class="language-bash">npm i @internetarchive/promised-singleton</code></pre>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<pre><code class="language-ts"><span class="hljs-comment">// foo-service-provider.ts</span>
+<span class="hljs-keyword">import</span> { PromisedSingleton } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@internetarchive/promised-singleton&#x27;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FooServiceProvider {
+
+  <span class="hljs-comment">// Use the PromisedSingleton object with the type of object you will be returning</span>
+  fooService: PromisedSingleton&lt;FooService&gt;;
+
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-comment">// Configure the PromisedSingleton with a `generator` Promise that knows how to generate</span>
+    <span class="hljs-comment">// the singleton</span>
+    <span class="hljs-built_in">this</span>.service = <span class="hljs-keyword">new</span> PromisedSingleton&lt;FooService&gt;({
+      generator: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-params">resolve</span> =&gt;</span> {
+        <span class="hljs-keyword">const</span> service = <span class="hljs-keyword">new</span> FooService();
+        service.setup().then(<span class="hljs-function"><span class="hljs-params">service</span> =&gt;</span> resolve(service))
+      })
+    });
+  }
+}
+
+<span class="hljs-comment">// consumer.ts</span>
+<span class="hljs-keyword">import</span> { FooServiceProvider } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./foo-service-provider&#x27;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> Consumer1 {
+  <span class="hljs-comment">// Passing the same FooServiceProvider into the consumers</span>
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params">serviceProvider: FooServiceProvider</span>) {
+    <span class="hljs-built_in">this</span>.serviceProvider = serviceProvider
+  }
+
+  <span class="hljs-keyword">async</span> setup() {
+    <span class="hljs-comment">// Call `.get()` on the property to fetch an instance of `FooService`</span>
+    <span class="hljs-comment">// Many consumers can call `get()` and they will all receive the same instance</span>
+    <span class="hljs-keyword">const</span> service = <span class="hljs-keyword">await</span> <span class="hljs-built_in">this</span>.serviceProvider.fooService.get();
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> service.fetchFoos();
+  }
+}</code></pre>
+				<a href="#linting-with-eslint-prettier-and-types" id="linting-with-eslint-prettier-and-types" style="color: inherit; text-decoration: none;">
+					<h2>Linting with ESLint, Prettier, and Types</h2>
+				</a>
+				<p>To scan the project for linting errors, run</p>
+				<pre><code class="language-bash">npm run lint</code></pre>
+				<p>You can lint with ESLint and Prettier individually as well</p>
+				<pre><code class="language-bash">npm run lint:eslint</code></pre>
+				<pre><code class="language-bash">npm run lint:prettier</code></pre>
+				<p>To automatically fix many linting errors, run</p>
+				<pre><code class="language-bash">npm run format</code></pre>
+				<p>You can format using ESLint and Prettier individually as well</p>
+				<pre><code class="language-bash">npm run format:eslint</code></pre>
+				<pre><code class="language-bash">npm run format:prettier</code></pre>
+				<a href="#testing-with-karma" id="testing-with-karma" style="color: inherit; text-decoration: none;">
+					<h2>Testing with Karma</h2>
+				</a>
+				<p>To run the suite of karma tests, run</p>
+				<pre><code class="language-bash">npm run <span class="hljs-built_in">test</span></code></pre>
+				<p>To run the tests in watch mode (for <abbr title="test driven development">TDD</abbr>, for example), run</p>
+				<pre><code class="language-bash">npm run <span class="hljs-built_in">test</span>:watch</code></pre>
+				<a href="#tooling-configs" id="tooling-configs" style="color: inherit; text-decoration: none;">
+					<h2>Tooling configs</h2>
+				</a>
+				<p>For most of the tools, the configuration is in the <code>package.json</code> to reduce the amount of files in your project.</p>
+				<p>If you customize the configuration a lot, you can consider moving them to individual files.</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_src_promised_singleton_.html">&quot;src/promised-<wbr>singleton&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

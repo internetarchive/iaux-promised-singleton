@@ -1,1 +1,1 @@
-export { PromisedSingleton } from './src/PromisedSingleton.js';
+export { PromisedSingleton } from './src/promised-singleton.js';

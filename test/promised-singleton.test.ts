@@ -1,40 +1,103 @@
-import { html, fixture, expect } from '@open-wc/testing';
+import { expect } from '@open-wc/testing';
 
-import {PromisedSingleton} from '../src/PromisedSingleton.js';
-import '../promised-singleton.js';
+import { PromisedSingleton } from '../src/promised-singleton';
 
-describe('PromisedSingleton', () => {
-  it('has a default title "Hey there" and counter 5', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton></promised-singleton>
-    `);
+describe('Promised Singleton', () => {
+  it('can execute the promised result', async () => {
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: new Promise(resolve => {
+        setTimeout(() => {
+          resolve('foo');
+        }, 25);
+      }),
+    });
 
-    expect(el.title).to.equal('Hey there');
-    expect(el.counter).to.equal(5);
+    const result = await promisedSingleton.get();
+    expect(result).to.equal('foo');
   });
 
-  it('increases the counter on button click', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton></promised-singleton>
-    `);
-    el.shadowRoot!.querySelector('button')!.click();
+  it('only executes the promised result once', async () => {
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: new Promise(resolve => {
+        setTimeout(() => {
+          const random = Math.random();
+          resolve(`foo-${random}`);
+        }, 25);
+      }),
+    });
 
-    expect(el.counter).to.equal(6);
+    const result = await promisedSingleton.get();
+    const result2 = await promisedSingleton.get();
+    expect(result).to.equal(result2);
   });
 
-  it('can override the title via attribute', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton title="attribute title"></promised-singleton>
-    `);
+  it('resolves many concurrent requests for the singleton', async () => {
+    const count = 5;
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: new Promise(resolve => {
+        setTimeout(() => {
+          const random = Math.random();
+          resolve(`foo-${random}`);
+        }, 25);
+      }),
+    });
 
-    expect(el.title).to.equal('attribute title');
+    const promises: Promise<string>[] = [];
+    for (let index = 0; index < count; index++) {
+      const promise = promisedSingleton.get();
+      promises.push(promise);
+    }
+
+    const results: string[] = await Promise.all(promises);
+
+    const firstResult = results[0];
+    for (let index = 0; index < count; index++) {
+      expect(results[index]).to.equal(firstResult);
+    }
   });
 
-  it('passes the a11y audit', async () => {
-    const el: PromisedSingleton = await fixture(html`
-      <promised-singleton></promised-singleton>
-    `);
+  // This test queues up 3 promises that get rejected and verifies that the same
+  // error message gets received by all three requests. This indicates they are
+  // all receiving the same rejection
+  it('rejects concurrent requests for the singleton', done => {
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const random = Math.random();
+          reject(`ohno-${random}`);
+        }, 25);
+      }),
+    });
 
-    await expect(el).shadowDom.to.be.accessible();
+    let firstError = '-';
+    promisedSingleton
+      .get()
+      .then(() => {
+        expect.fail('should not get here');
+      })
+      .catch(error => {
+        firstError = error;
+      });
+
+    let secondError = '.';
+    promisedSingleton
+      .get()
+      .then(() => {
+        expect.fail('should not get here');
+      })
+      .catch(error => {
+        secondError = error;
+      });
+
+    promisedSingleton
+      .get()
+      .then(() => {
+        expect.fail('should not get here');
+      })
+      .catch(error => {
+        expect(error).to.equal(firstError);
+        expect(error).to.equal(secondError);
+        done();
+      });
   });
 });
