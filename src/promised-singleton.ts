@@ -46,19 +46,18 @@ export class PromisedSingleton<T> {
   }
 
   private async generateSingletonAndCache(): Promise<T> {
-    return this.generator.then(response => {
-      this.cachedResponse = response;
-      return response;
-    });
+    const result = await this.generator();
+    this.cachedResponse = result;
+    return result;
   }
 
   private previousPromise?: Promise<T>;
 
   private cachedResponse?: T;
 
-  private generator: Promise<T>;
+  private generator: () => Promise<T>;
 
-  constructor(options: { generator: Promise<T> }) {
+  constructor(options: { generator: () => Promise<T> }) {
     this.generator = options.generator;
   }
 }

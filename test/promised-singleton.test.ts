@@ -1,15 +1,17 @@
 import { expect } from '@open-wc/testing';
 
 import { PromisedSingleton } from '../src/promised-singleton';
+import { promisedSleep } from './promised-sleep';
 
 describe('Promised Singleton', () => {
   it('can execute the promised result', async () => {
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
-      generator: new Promise(resolve => {
-        setTimeout(() => {
-          resolve('foo');
-        }, 25);
-      }),
+      generator: (): Promise<string> =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            resolve('foo');
+          }, 25);
+        }),
     });
 
     const result = await promisedSingleton.get();
@@ -18,12 +20,13 @@ describe('Promised Singleton', () => {
 
   it('only executes the promised result once', async () => {
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
-      generator: new Promise(resolve => {
-        setTimeout(() => {
-          const random = Math.random();
-          resolve(`foo-${random}`);
-        }, 25);
-      }),
+      generator: (): Promise<string> =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            const random = Math.random();
+            resolve(`foo-${random}`);
+          }, 25);
+        }),
     });
 
     const result = await promisedSingleton.get();
@@ -34,12 +37,13 @@ describe('Promised Singleton', () => {
   it('resolves many concurrent requests for the singleton', async () => {
     const count = 5;
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
-      generator: new Promise(resolve => {
-        setTimeout(() => {
-          const random = Math.random();
-          resolve(`foo-${random}`);
-        }, 25);
-      }),
+      generator: (): Promise<string> =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            const random = Math.random();
+            resolve(`foo-${random}`);
+          }, 25);
+        }),
     });
 
     const promises: Promise<string>[] = [];
@@ -61,12 +65,13 @@ describe('Promised Singleton', () => {
   // all receiving the same rejection
   it('rejects concurrent requests for the singleton', done => {
     const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
-      generator: new Promise((resolve, reject) => {
-        setTimeout(() => {
-          const random = Math.random();
-          reject(`ohno-${random}`);
-        }, 25);
-      }),
+      generator: (): Promise<string> =>
+        new Promise((resolve, reject) => {
+          setTimeout(() => {
+            const random = Math.random();
+            reject(`ohno-${random}`);
+          }, 25);
+        }),
     });
 
     let firstError = '-';
@@ -99,5 +104,29 @@ describe('Promised Singleton', () => {
         expect(error).to.equal(secondError);
         done();
       });
+  });
+
+  it('can be passed an async function', async () => {
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: async (): Promise<string> => {
+        await promisedSleep(25);
+        return 'foo';
+      },
+    });
+    const result = await promisedSingleton.get();
+    expect(result).to.equal('foo');
+  });
+
+  it('does not execute the promise until it is requested', async () => {
+    let called = false;
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: async (): Promise<string> => {
+        called = true;
+        return 'foo';
+      },
+    });
+    expect(called).to.be.false;
+    await promisedSingleton.get();
+    expect(called).to.be.true;
   });
 });
