@@ -36,8 +36,8 @@ import { PromisedSingleton } from '@internetarchive/promised-singleton';
 
 export class FooServiceProvider {
 
-  // Use the PromisedSingleton object with the type of object you will be returning
-  fooService: PromisedSingleton<FooService> = new PromisedSingleton<FooService>({
+  // Using a Promise
+  fooService = new PromisedSingleton<FooService>({
     generator: (): Promise<FooService> => new Promise(resolve => {
       const service = new FooService();
       service.setup().then(service => resolve(service))
@@ -45,7 +45,7 @@ export class FooServiceProvider {
   });
 
   // Using an async function
-  barService: PromisedSingleton<BarService> = new PromisedSingleton<BarService>({
+  barService = new PromisedSingleton<BarService>({
     generator: async (): Promise<FooService> => {
       const service = new BarService();
       await service.setup();
