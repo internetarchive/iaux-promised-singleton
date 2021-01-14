@@ -10,6 +10,7 @@
   "scripts": {
     "tsc:watch": "tsc --watch",
     "docs": "typedoc",
+    "prepare": "tsc",
     "lint:eslint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format:eslint": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
     "lint:prettier": "prettier \"**/*.ts\" --check --ignore-path .gitignore",
