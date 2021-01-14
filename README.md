@@ -46,7 +46,7 @@ export class FooServiceProvider {
 
   // Using an async function
   barService = new PromisedSingleton<BarService>({
-    generator: async (): Promise<FooService> => {
+    generator: async (): Promise<BarService> => {
       const service = new BarService();
       await service.setup();
       return service;
