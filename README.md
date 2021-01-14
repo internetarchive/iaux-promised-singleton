@@ -36,19 +36,22 @@ import { PromisedSingleton } from '@internetarchive/promised-singleton';
 
 export class FooServiceProvider {
 
-  // Use the PromisedSingleton object with the type of object you will be returning
-  fooService: PromisedSingleton<FooService>;
+  // Using a Promise
+  fooService = new PromisedSingleton<FooService>({
+    generator: (): Promise<FooService> => new Promise(resolve => {
+      const service = new FooService();
+      service.setup().then(service => resolve(service))
+    })
+  });
 
-  constructor() {
-    // Configure the PromisedSingleton with a `generator` Promise that knows how to generate
-    // the singleton
-    this.service = new PromisedSingleton<FooService>({
-      generator: new Promise(resolve => {
-        const service = new FooService();
-        service.setup().then(service => resolve(service))
-      })
-    });
-  }
+  // Using an async function
+  barService = new PromisedSingleton<BarService>({
+    generator: async (): Promise<BarService> => {
+      const service = new BarService();
+      await service.setup();
+      return service;
+    })
+  });
 }
 
 // consumer.ts
