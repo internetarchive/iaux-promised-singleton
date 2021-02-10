@@ -45,6 +45,11 @@ export class PromisedSingleton<T> {
     return this.previousPromise;
   }
 
+  reset(): void {
+    this.cachedResponse = undefined;
+    this.previousPromise = undefined;
+  }
+
   private async generateSingletonAndCache(): Promise<T> {
     const result = await this.generator();
     this.cachedResponse = result;
