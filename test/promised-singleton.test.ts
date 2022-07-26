@@ -129,4 +129,43 @@ describe('Promised Singleton', () => {
     await promisedSingleton.get();
     expect(called).to.be.true;
   });
+
+  it('can be reset so the promise gets executed again', async () => {
+    let calledCount = 0;
+    const promisedSingleton: PromisedSingleton<string> = new PromisedSingleton({
+      generator: async (): Promise<string> => {
+        calledCount += 1;
+        return 'foo';
+      },
+    });
+    expect(calledCount).to.equal(0);
+    await promisedSingleton.get();
+    expect(calledCount).to.equal(1);
+    promisedSingleton.reset();
+    expect(calledCount).to.equal(1);
+    await promisedSingleton.get();
+    expect(calledCount).to.equal(2);
+  });
+
+  it('can return an updated external value', async () => {
+    let expectedReturn = 0;
+    const promisedSingleton: PromisedSingleton<number> = new PromisedSingleton({
+      generator: async (): Promise<number> => {
+        return expectedReturn;
+      },
+    });
+
+    const result1 = await promisedSingleton.get();
+    expect(result1).to.equal(0);
+    expectedReturn = 1;
+
+    // verify the promise didn't update after the external value updated
+    const result2 = await promisedSingleton.get();
+    expect(result2).to.equal(0);
+
+    // reset then check the value again and it should be udpated
+    promisedSingleton.reset();
+    const result3 = await promisedSingleton.get();
+    expect(result3).to.equal(1);
+  });
 });

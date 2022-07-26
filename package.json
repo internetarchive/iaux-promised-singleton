@@ -1,6 +1,6 @@
 {
   "name": "@internetarchive/promised-singleton",
-  "version": "0.2.1",
+  "version": "0.3.0-alpha.1",
   "description": "A class for lazy-loading singletons.",
   "author": "promised-singleton",
   "license": "AGPL-3.0-only",
