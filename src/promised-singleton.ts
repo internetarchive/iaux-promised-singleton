@@ -63,7 +63,7 @@ export class PromisedSingleton<T> {
 
   private cachedResponse?: T;
 
-  private generator: () => Promise<T>;
+  private generator: PromisedSingletonGenerator<T>;
 
   constructor(args: PromisedSingletonArgs<T>) {
     if (typeof args === 'function') {
