@@ -129,4 +129,34 @@ describe('Promised Singleton', () => {
     await promisedSingleton.get();
     expect(called).to.be.true;
   });
+
+  describe('constructor argument validation', () => {
+    it('throws if not passed a function or object with generator function', () => {
+      expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _promisedSingleton: PromisedSingleton<string> =
+          // @ts-expect-error
+          new PromisedSingleton('42');
+      }).to.throw('PromisedSingleton requires a generator function');
+    });
+
+    it('can take a generator function without the object wrapper', async () => {
+      const promisedSingleton: PromisedSingleton<string> =
+        new PromisedSingleton(async (): Promise<string> => 'foo');
+      const result = await promisedSingleton.get();
+      expect(result).to.equal('foo');
+    });
+
+    it('can take a generator in an object', async () => {
+      const promisedSingleton: PromisedSingleton<string> =
+        new PromisedSingleton({
+          generator: async (): Promise<string> => {
+            await promisedSleep(25);
+            return 'foo';
+          },
+        });
+      const result = await promisedSingleton.get();
+      expect(result).to.equal('foo');
+    });
+  });
 });

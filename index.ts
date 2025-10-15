@@ -1,1 +1,5 @@
-export { PromisedSingleton } from './src/promised-singleton.js';
+export {
+  PromisedSingleton,
+  PromisedSingletonArgs,
+  PromisedSingletonGenerator,
+} from './src/promised-singleton';

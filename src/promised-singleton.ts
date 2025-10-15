@@ -1,3 +1,11 @@
+export type PromisedSingletonGenerator<T> = () => Promise<T>;
+
+export type PromisedSingletonArgs<T> =
+  | PromisedSingletonGenerator<T>
+  | {
+      generator: PromisedSingletonGenerator<T>;
+    };
+
 /**
  * The PromisedSingleton is a generic wrapper for an asynchronous object that you only
  * want one instance of (a singleton).
@@ -55,9 +63,18 @@ export class PromisedSingleton<T> {
 
   private cachedResponse?: T;
 
-  private generator: () => Promise<T>;
+  private generator: PromisedSingletonGenerator<T>;
 
-  constructor(options: { generator: () => Promise<T> }) {
-    this.generator = options.generator;
+  constructor(args: PromisedSingletonArgs<T>) {
+    if (typeof args === 'function') {
+      this.generator = args;
+    } else if (
+      typeof args === 'object' &&
+      typeof args.generator === 'function'
+    ) {
+      this.generator = args.generator;
+    } else {
+      throw new Error('PromisedSingleton requires a generator function');
+    }
   }
 }
