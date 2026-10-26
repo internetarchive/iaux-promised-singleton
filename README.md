@@ -2,6 +2,8 @@
 
 # PromisedSingleton
 
+> Moved to [@internetarchive/elements](https://github.com/internetarchive/elements) (`src/services/promised-singleton`). New work goes there.
+
 A generic Typescript class for lazy-loading singletons.
 
 `PromisedSingleton` is a generic wrapper for an asynchronously generated object that you only
